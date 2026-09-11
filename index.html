@@ -23,7 +23,7 @@
             description: "香港電台 + 新城電台簡易播放器",
             start_url: "./",
             display: "standalone",
-            background_color: "#fff0f5",
+            background_color: "#f5d6e3",
             theme_color: "#d32f2f",
             icons: [{
                 src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23d32f2f'/%3E%3Ctext x='90' y='108' font-family='Arial,Helvetica,sans-serif' font-size='42' font-weight='bold' fill='white' text-anchor='middle'%3ERTHK%3C/text%3E%3C/svg%3E",
@@ -38,7 +38,8 @@
 
     <style>
         :root {
-            --bg-color: #fff0f5;
+            /* 原粉紅 #fff0f5、原淺藍 #e8f4fc，約加深 20% */
+            --bg-color: #f5d6e3;
             --card-bg: #ffffff;
             --text-main: #1a1a1a;
             --text-sub: #555555;
@@ -46,8 +47,8 @@
             --accent-green: #2e7d32;
             --shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
-        body.theme-blue { --bg-color: #e8f4fc; }
-        body.theme-pink { --bg-color: #fff0f5; }
+        body.theme-blue { --bg-color: #d0e6f5; }
+        body.theme-pink { --bg-color: #f5d6e3; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
         body {
             margin: 0;
@@ -95,8 +96,6 @@
         .status-title { font-size: 18px; font-weight: bold; margin-bottom: 2px; }
         .status-state { font-size: 14px; font-weight: bold; color: var(--text-sub); }
         .status-card.playing .status-state { color: var(--accent-green); }
-
-        /* 分類標題：加大約 1.5 倍（原 13px → 約 20px） */
         .section-title {
             width: 100%;
             max-width: 520px;
@@ -105,7 +104,6 @@
             color: #555;
             margin: 6px 0 10px 2px;
         }
-
         .grid-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -163,10 +161,23 @@
         }
         .stop-btn:active { opacity: 0.85; transform: scale(0.98); }
         .instructions {
-            margin-top: auto; padding-top: 12px; text-align: center; font-size: 12px;
-            color: #777; max-width: 520px; line-height: 1.5;
+            margin-top: auto;
+            padding-top: 12px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            max-width: 520px;
+            line-height: 1.7;
         }
-        .note { font-size: 11px; color: #999; margin-top: 4px; }
+        .instructions .line {
+            display: block;
+        }
+        .note {
+            font-size: 11px;
+            color: #888;
+            margin-top: 6px;
+            display: block;
+        }
     </style>
 </head>
 <body class="theme-pink">
@@ -181,7 +192,7 @@
         <div class="status-state" id="currentState">按下下方按鈕即可播放</div>
     </div>
 
-    <div class="section-title">香港電台</div>
+    <div class="section-title">香港電台 RTHK</div>
     <div class="grid-container">
         <button class="channel-btn" onclick="playChannel(event, 1, '第一台', 'https://rthkradio1-live.akamaized.net/hls/live/2035313/radio1/master.m3u8')">
             <div class="channel-info">
@@ -221,7 +232,7 @@
         <div></div>
     </div>
 
-    <div class="section-title">新城電台</div>
+    <div class="section-title">新城電台 Metro</div>
     <div class="grid-container">
         <button class="channel-btn" onclick="playChannel(event, 6, '知訊台 997', 'https://1603884249.rsc.cdn77.org/1603884249/index.m3u8')">
             <div class="channel-info">
@@ -239,7 +250,7 @@
         </button>
     </div>
 
-    <div class="section-title">商業電台</div>
+    <div class="section-title">商業電台（開啟官方網頁）</div>
     <div class="grid-container">
         <button class="channel-btn link-btn" onclick="openOfficial('https://www.881903.com/live/881')">
             <div class="channel-info">
@@ -260,9 +271,9 @@
     <button class="stop-btn" onclick="stopAudio()">⏹ 停止播放</button>
 
     <div class="instructions">
-        iPhone：Safari 分享 →「加入主畫面」,
-        Android：Chrome 選單 →「加入主畫面」
-        <div class="note">HK Radio - version 1.1</div>
+        <span class="line">iPhone：Safari 分享 →「加入主畫面」</span>
+        <span class="line">Android：Chrome 選單 →「加入主畫面」</span>
+        <span class="note">點商台會先停止本頁播放，再開啟 881903.com</span>
     </div>
 
     <audio id="audioPlayer" playsinline preload="none"></audio>
