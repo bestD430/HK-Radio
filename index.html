@@ -20,10 +20,10 @@
         const manifest = {
             name: "香港電台",
             short_name: "RTHK",
-            description: "香港電台 + 新城電台簡易播放器",
+            description: "",
             start_url: "./",
             display: "standalone",
-            background_color: "#f5d6e3",
+            background_color: "#f5c6d0",
             theme_color: "#d32f2f",
             icons: [{
                 src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23d32f2f'/%3E%3Ctext x='90' y='108' font-family='Arial,Helvetica,sans-serif' font-size='42' font-weight='bold' fill='white' text-anchor='middle'%3ERTHK%3C/text%3E%3C/svg%3E",
@@ -38,41 +38,49 @@
 
     <style>
         :root {
-            /* 原粉紅 #fff0f5、原淺藍 #e8f4fc，約加深 20% */
-            --bg-color: #f5d6e3;
+            --bg-color: #f5c6d0;          /* 粉紅加深約30% (原 #fff0f5 → 更深粉) */
             --card-bg: #ffffff;
             --text-main: #1a1a1a;
             --text-sub: #555555;
             --accent-red: #d32f2f;
             --accent-green: #2e7d32;
-            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow: 0 3px 8px rgba(0,0,0,0.08);
         }
-        body.theme-blue { --bg-color: #d0e6f5; }
-        body.theme-pink { --bg-color: #f5d6e3; }
+        body.theme-blue { --bg-color: #9fc8e8; } /* 淺藍加深約45% (原 #e8f4fc → 更深藍) */
+        body.theme-pink { --bg-color: #f5c6d0; }
+
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+
         body {
             margin: 0;
-            padding: calc(env(safe-area-inset-top) + 16px) 12px calc(env(safe-area-inset-bottom) + 16px) 12px;
+            padding: calc(env(safe-area-inset-top) + 10px) 10px calc(env(safe-area-inset-bottom) + 10px) 10px;
             font-family: -apple-system, BlinkMacSystemFont, "PingFang HK", "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
             transition: background-color 0.25s ease;
+            /* 針對 iPhone 6 Plus (414×736) 優化 */
+            max-width: 100%;
+            overflow-x: hidden;
         }
+
         .theme-bar {
             width: 100%;
-            max-width: 520px;
+            max-width: 400px;
             display: flex;
             justify-content: center;
-            gap: 8px;
-            margin-bottom: 14px;
+            gap: 6px;
+            margin-bottom: 10px;
         }
         .theme-btn {
             border: 2px solid #ddd;
             background: #fff;
-            border-radius: 20px;
-            padding: 6px 14px;
-            font-size: 13px;
+            border-radius: 18px;
+            padding: 5px 12px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             color: #444;
@@ -87,36 +95,60 @@
             background: #e3f2fd;
             color: #1565c0;
         }
+
         .status-card {
-            background: var(--card-bg); width: 100%; max-width: 520px; padding: 14px 16px;
-            border-radius: 16px; box-shadow: var(--shadow); margin-bottom: 14px;
-            text-align: center; border: 3px solid transparent; transition: all 0.3s ease;
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 400px;
+            padding: 11px 14px;
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+            text-align: center;
+            border: 2.5px solid transparent;
+            transition: all 0.3s ease;
         }
-        .status-card.playing { border-color: var(--accent-green); background: #f1f8e9; }
-        .status-title { font-size: 18px; font-weight: bold; margin-bottom: 2px; }
-        .status-state { font-size: 14px; font-weight: bold; color: var(--text-sub); }
-        .status-card.playing .status-state { color: var(--accent-green); }
+        .status-card.playing {
+            border-color: var(--accent-green);
+            background: #f1f8e9;
+        }
+        .status-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 1px;
+        }
+        .status-state {
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--text-sub);
+        }
+        .status-card.playing .status-state {
+            color: var(--accent-green);
+        }
+
         .section-title {
             width: 100%;
-            max-width: 520px;
-            font-size: 20px;
+            max-width: 400px;
+            font-size: 17px;
             font-weight: 800;
             color: #555;
-            margin: 6px 0 10px 2px;
+            margin: 4px 0 8px 2px;
         }
+
         .grid-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
-            max-width: 520px;
-            margin-bottom: 12px;
+            max-width: 400px;
+            margin-bottom: 10px;
         }
+
         .channel-btn {
             background: var(--card-bg);
-            border: 2.5px solid #e0e0e0;
-            border-radius: 14px;
-            padding: 12px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 10px 10px;
             display: flex;
             flex-direction: row;
             align-items: center;
@@ -124,59 +156,119 @@
             cursor: pointer;
             box-shadow: var(--shadow);
             text-align: left;
-            min-height: 72px;
+            min-height: 62px;
             transition: transform 0.1s, border-color 0.2s, background 0.2s;
         }
-        .channel-btn:active { transform: scale(0.97); }
-        .channel-btn.active { border-color: var(--accent-red); background: #fff8f8; }
-        .channel-btn.link-btn { border-style: dashed; }
+        .channel-btn:active {
+            transform: scale(0.97);
+        }
+        .channel-btn.active {
+            border-color: var(--accent-red);
+            background: #fff8f8;
+        }
+        .channel-btn.link-btn {
+            border-style: dashed;
+        }
+
         .channel-info {
             display: flex;
             flex-direction: column;
             flex: 1;
             min-width: 0;
-            padding-right: 8px;
+            padding-right: 6px;
         }
-        .channel-name { font-size: 16px; font-weight: 800; line-height: 1.2; }
-        .channel-desc { font-size: 11px; color: var(--text-sub); font-weight: 500; margin-top: 3px; line-height: 1.3; }
+        .channel-name {
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+        .channel-desc {
+            font-size: 10px;
+            color: var(--text-sub);
+            font-weight: 500;
+            margin-top: 2px;
+            line-height: 1.25;
+        }
+
         .play-icon {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: var(--accent-red);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 15px;
+            font-size: 13px;
             font-weight: bold;
             flex-shrink: 0;
         }
-        .channel-btn.active .play-icon { background: var(--accent-green); }
-        .channel-btn.link-btn .play-icon { background: #666; font-size: 14px; }
-        .stop-btn {
-            width: 100%; max-width: 520px; padding: 14px; font-size: 18px; font-weight: bold;
-            color: white; background: #555; border: none; border-radius: 14px;
-            box-shadow: var(--shadow); cursor: pointer; margin-bottom: 8px;
+        .channel-btn.active .play-icon {
+            background: var(--accent-green);
         }
-        .stop-btn:active { opacity: 0.85; transform: scale(0.98); }
+        .channel-btn.link-btn .play-icon {
+            background: #666;
+            font-size: 12px;
+        }
+
+        .stop-btn {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background: #555;
+            border: none;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            margin-bottom: 6px;
+        }
+        .stop-btn:active {
+            opacity: 0.85;
+            transform: scale(0.98);
+        }
+
         .instructions {
             margin-top: auto;
-            padding-top: 12px;
+            padding-top: 8px;
             text-align: center;
-            font-size: 12px;
-            color: #666;
-            max-width: 520px;
-            line-height: 1.7;
-        }
-        .instructions .line {
-            display: block;
+            font-size: 11px;
+            color: #777;
+            max-width: 400px;
+            line-height: 1.4;
         }
         .note {
-            font-size: 11px;
-            color: #888;
-            margin-top: 6px;
-            display: block;
+            font-size: 10px;
+            color: #999;
+            margin-top: 3px;
+        }
+
+        /* iPhone 6 Plus 專用微調 (414px 寬) */
+        @media screen and (max-width: 420px) {
+            body {
+                padding: calc(env(safe-area-inset-top) + 8px) 8px calc(env(safe-area-inset-bottom) + 8px) 8px;
+            }
+            .grid-container {
+                gap: 7px;
+            }
+            .channel-btn {
+                min-height: 58px;
+                padding: 8px 9px;
+            }
+            .channel-name {
+                font-size: 13.5px;
+            }
+            .play-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+            .section-title {
+                font-size: 16px;
+                margin: 3px 0 7px 1px;
+            }
         }
     </style>
 </head>
@@ -273,8 +365,9 @@
     <div class="instructions">
         <span class="line">iPhone：Safari 分享 →「加入主畫面」</span>
         <span class="line">Android：Chrome 選單 →「加入主畫面」</span>
-        <span class="note">HK Radio V1.1</span>
+        <span class="note">HK Radio V1.1 · 適配 iPhone 6 Plus</span>
         <span class="line">😌 by DL</span>
+        
     </div>
 
     <audio id="audioPlayer" playsinline preload="none"></audio>
