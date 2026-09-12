@@ -38,7 +38,7 @@
 
     <style>
         :root {
-            --bg-color: #f5c6d0;          /* 粉紅加深約30% (原 #fff0f5 → 更深粉) */
+            --bg-color: #f5c6d0;
             --card-bg: #ffffff;
             --text-main: #1a1a1a;
             --text-sub: #555555;
@@ -46,7 +46,7 @@
             --accent-green: #2e7d32;
             --shadow: 0 3px 8px rgba(0,0,0,0.08);
         }
-        body.theme-blue { --bg-color: #9fc8e8; } /* 淺藍加深約45% (原 #e8f4fc → 更深藍) */
+        body.theme-blue { --bg-color: #9fc8e8; }
         body.theme-pink { --bg-color: #f5c6d0; }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -62,7 +62,6 @@
             align-items: center;
             min-height: 100vh;
             transition: background-color 0.25s ease;
-            /* 針對 iPhone 6 Plus (414×736) 優化 */
             max-width: 100%;
             overflow-x: hidden;
         }
@@ -124,6 +123,25 @@
         }
         .status-card.playing .status-state {
             color: var(--accent-green);
+        }
+
+        .stop-btn {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background: #555;
+            border: none;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+        .stop-btn:active {
+            opacity: 0.85;
+            transform: scale(0.98);
         }
 
         .section-title {
@@ -211,25 +229,6 @@
             font-size: 12px;
         }
 
-        .stop-btn {
-            width: 100%;
-            max-width: 400px;
-            padding: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            color: white;
-            background: #555;
-            border: none;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            cursor: pointer;
-            margin-bottom: 6px;
-        }
-        .stop-btn:active {
-            opacity: 0.85;
-            transform: scale(0.98);
-        }
-
         .instructions {
             margin-top: auto;
             padding-top: 8px;
@@ -245,7 +244,6 @@
             margin-top: 3px;
         }
 
-        /* iPhone 6 Plus 專用微調 (414px 寬) */
         @media screen and (max-width: 420px) {
             body {
                 padding: calc(env(safe-area-inset-top) + 8px) 8px calc(env(safe-area-inset-bottom) + 8px) 8px;
@@ -269,6 +267,11 @@
                 font-size: 16px;
                 margin: 3px 0 7px 1px;
             }
+            .stop-btn {
+                padding: 11px;
+                font-size: 15px;
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
@@ -283,6 +286,9 @@
         <div class="status-title" id="currentChannel">請選擇電台</div>
         <div class="status-state" id="currentState">按下下方按鈕即可播放</div>
     </div>
+
+    <!-- 停止播放鍵已移至 RTHK 選台卡片上方 -->
+    <button class="stop-btn" onclick="stopAudio()">⏹ 停止播放</button>
 
     <div class="section-title">香港電台</div>
     <div class="grid-container">
@@ -360,14 +366,11 @@
         </button>
     </div>
 
-    <button class="stop-btn" onclick="stopAudio()">⏹ 停止播放</button>
-
     <div class="instructions">
         <span class="line">iPhone：Safari 分享 →「加入主畫面」</span>
         <span class="line">Android：Chrome 選單 →「加入主畫面」</span>
         <span class="note">HK Radio V1.1 · 適配 iPhone 6 Plus</span>
         <span class="line">😌 by DL</span>
-        
     </div>
 
     <audio id="audioPlayer" playsinline preload="none"></audio>
