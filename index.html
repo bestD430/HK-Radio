@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="香港電台">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#d32f2f">
+    <meta name="theme-color" content="#f5c6d0" id="themeColorMeta">
     <meta name="application-name" content="香港電台">
     
     <title>香港電台</title>
@@ -24,7 +24,7 @@
             start_url: "./",
             display: "standalone",
             background_color: "#f5c6d0",
-            theme_color: "#d32f2f",
+            theme_color: "#f5c6d0",
             icons: [{
                 src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23d32f2f'/%3E%3Ctext x='90' y='108' font-family='Arial,Helvetica,sans-serif' font-size='42' font-weight='bold' fill='white' text-anchor='middle'%3ERTHK%3C/text%3E%3C/svg%3E",
                 sizes: "180x180",
@@ -36,7 +36,6 @@
         document.write('<link rel="manifest" href="' + URL.createObjectURL(blob) + '">');
     </script>
 
-    <!-- 加入 hls.js 以支援 Android Chrome 播放 m3u8 -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15"></script>
 
     <style>
@@ -373,7 +372,7 @@
 
     <div class="instructions">
         <span class="line">iPhone：Safari 分享 →「加入主畫面」</span>
-        <span class="line">Android：Chrome 選單 →「加入主畫面」</span>
+        <span class="line">Android：Chrome 選單 →「加入主畫面」或 安裝 </span>
         <span class="line note">HK Radio V1.1 · 適配 iPhone 6 Plus</span>
         <span class="line">😌 by DL🎵</span>
     </div>
@@ -385,14 +384,22 @@
         const statusCard = document.getElementById('statusCard');
         const currentChannelEl = document.getElementById('currentChannel');
         const currentStateEl = document.getElementById('currentState');
+        const themeColorMeta = document.getElementById('themeColorMeta');
         let activeId = null;
-        let hls = null;   // 用於 hls.js 實例
+        let hls = null;
 
         function setTheme(theme) {
             document.body.classList.remove('theme-pink', 'theme-blue');
             document.body.classList.add(theme === 'blue' ? 'theme-blue' : 'theme-pink');
             document.getElementById('btnPink').classList.toggle('active-pink', theme === 'pink');
             document.getElementById('btnBlue').classList.toggle('active-blue', theme === 'blue');
+
+            // 頂部狀態列顏色跟隨底色
+            const bgColor = theme === 'blue' ? '#9fc8e8' : '#f5c6d0';
+            if (themeColorMeta) {
+                themeColorMeta.setAttribute('content', bgColor);
+            }
+
             try { localStorage.setItem('radioTheme', theme); } catch (e) {}
         }
 
@@ -410,7 +417,6 @@
         }
 
         function playChannel(e, id, name, url) {
-            // 更新 UI
             document.querySelectorAll('.channel-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.play-icon').forEach(icon => {
                 if (icon.textContent !== '↗') icon.textContent = '▶';
@@ -426,15 +432,12 @@
 
             activeId = id;
 
-            // 清理舊的播放
             destroyHls();
             audio.pause();
             audio.removeAttribute('src');
             audio.load();
 
-            // 判斷是否支援 HLS
             if (Hls.isSupported()) {
-                // Android Chrome / 大部分現代瀏覽器 → 使用 hls.js
                 hls = new Hls({
                     enableWorker: true,
                     lowLatencyMode: true,
@@ -465,7 +468,6 @@
                 });
 
             } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
-                // iOS Safari 原生支援 HLS
                 audio.src = url;
                 const playPromise = audio.play();
                 if (playPromise !== undefined) {
