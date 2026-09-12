@@ -36,6 +36,9 @@
         document.write('<link rel="manifest" href="' + URL.createObjectURL(blob) + '">');
     </script>
 
+    <!-- 加入 hls.js 以支援 Android Chrome 播放 m3u8 -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15"></script>
+
     <style>
         :root {
             --bg-color: #f5c6d0;
@@ -383,6 +386,7 @@
         const currentChannelEl = document.getElementById('currentChannel');
         const currentStateEl = document.getElementById('currentState');
         let activeId = null;
+        let hls = null;   // 用於 hls.js 實例
 
         function setTheme(theme) {
             document.body.classList.remove('theme-pink', 'theme-blue');
@@ -398,7 +402,15 @@
             setTheme(saved);
         })();
 
+        function destroyHls() {
+            if (hls) {
+                hls.destroy();
+                hls = null;
+            }
+        }
+
         function playChannel(e, id, name, url) {
+            // 更新 UI
             document.querySelectorAll('.channel-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.play-icon').forEach(icon => {
                 if (icon.textContent !== '↗') icon.textContent = '▶';
@@ -413,17 +425,61 @@
             statusCard.classList.remove('playing');
 
             activeId = id;
-            audio.src = url;
 
-            const playPromise = audio.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    currentStateEl.textContent = "正在播放中 🟢";
-                    statusCard.classList.add('playing');
-                }).catch(() => {
-                    currentStateEl.textContent = "播放失敗，請再試一次";
-                    statusCard.classList.remove('playing');
+            // 清理舊的播放
+            destroyHls();
+            audio.pause();
+            audio.removeAttribute('src');
+            audio.load();
+
+            // 判斷是否支援 HLS
+            if (Hls.isSupported()) {
+                // Android Chrome / 大部分現代瀏覽器 → 使用 hls.js
+                hls = new Hls({
+                    enableWorker: true,
+                    lowLatencyMode: true,
+                    backBufferLength: 90
                 });
+                hls.loadSource(url);
+                hls.attachMedia(audio);
+
+                hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                    const playPromise = audio.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            currentStateEl.textContent = "正在播放中 🟢";
+                            statusCard.classList.add('playing');
+                        }).catch(() => {
+                            currentStateEl.textContent = "播放失敗，請再試一次";
+                            statusCard.classList.remove('playing');
+                        });
+                    }
+                });
+
+                hls.on(Hls.Events.ERROR, function (event, data) {
+                    if (data.fatal) {
+                        currentStateEl.textContent = "連線失敗，請再試一次";
+                        statusCard.classList.remove('playing');
+                        destroyHls();
+                    }
+                });
+
+            } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
+                // iOS Safari 原生支援 HLS
+                audio.src = url;
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        currentStateEl.textContent = "正在播放中 🟢";
+                        statusCard.classList.add('playing');
+                    }).catch(() => {
+                        currentStateEl.textContent = "播放失敗，請再試一次";
+                        statusCard.classList.remove('playing');
+                    });
+                }
+            } else {
+                currentStateEl.textContent = "此瀏覽器不支援此串流";
+                statusCard.classList.remove('playing');
             }
         }
 
@@ -435,10 +491,12 @@
         }
 
         function stopAudio() {
+            destroyHls();
             audio.pause();
             audio.removeAttribute('src');
             audio.load();
             activeId = null;
+
             document.querySelectorAll('.channel-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.play-icon').forEach(icon => {
                 if (icon.textContent !== '↗') icon.textContent = '▶';
